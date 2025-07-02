@@ -9,5 +9,4 @@ public class CartShieldServerApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(CartShieldServerApplication.class, args);
 	}
-
 }
