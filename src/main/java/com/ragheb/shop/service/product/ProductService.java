@@ -2,6 +2,7 @@ package com.ragheb.shop.service.product;
 
 import com.ragheb.shop.dto.ImageDto;
 import com.ragheb.shop.dto.ProductDto;
+import com.ragheb.shop.exception.AlreadyExistsException;
 import com.ragheb.shop.exception.ResourceNotFoundException;
 import com.ragheb.shop.model.Category;
 import com.ragheb.shop.model.Image;
@@ -33,6 +34,10 @@ public class ProductService implements IProductService {
         // If No, the save it as a new category
         // The set as the new product category.
 
+        if (productExists(request.getName(), request.getBrand())){
+            throw new AlreadyExistsException(request.getBrand()+ " "+ request.getName()+ " already exists, you may update this product instead!");
+        }
+
         Category category = Optional.ofNullable(categoryRepository.findByName(request.getCategory().getName()))
                 .orElseGet(() -> {
                     Category newCategory = new Category(request.getCategory().getName());
@@ -40,6 +45,10 @@ public class ProductService implements IProductService {
                 });
         request.setCategory(category);
         return productRepository.save(createProduct(request, category));
+    }
+
+    private boolean productExists(String name, String brand){
+        return productRepository.existsByNameAndBrand(name, brand);
     }
 
     private Product createProduct(AddProductRequest request, Category category) {
